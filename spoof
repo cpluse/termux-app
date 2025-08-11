@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Generate 2 random lowercase words (6 letters each)
+word1=$(tr -dc 'a-z' </dev/urandom | head -c6)
+word2=$(tr -dc 'a-z' </dev/urandom | head -c6)
+
+echo "Generated words:"
+echo "com     -> $word1"
+echo "termux  -> $word2"
+echo ""
+
+# Export variables for use in find -exec
+export word1 word2
+
+# Rename directories
+find . -depth -type d -name 'com' -execdir mv {} "$word1" \;
+find . -depth -type d -name 'termux' -execdir mv {} "$word2" \;
+
+# Replace inside files
+find . -type f -exec sed -i \
+    -e "s/com\.termux/$word1.$word2/g" \
+    -e "s/com\/termux/$word1\/$word2/g" \
+    -e "s/com_termux/${word1}_${word2}/g" {} +
+
+echo "Done."
